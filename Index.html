@@ -6,20 +6,19 @@
     <title>Perkenalan</title>
     <style>
         body {
-            background: linear-gradient(to right, #ffffff, #0000ff);
-            min-height: 100vh; /* Agar gradien terlihat penuh di seluruh tinggi viewport */
-            margin: 0; /* Menghilangkan margin default browser */
-            display: flex; /* Menggunakan flexbox untuk memposisikan konten di tengah */
-            justify-content: center; /* Memposisikan horizontal di tengah */
-            align-items: center; /* Memposisikan vertikal di tengah */
-            font-family: Arial, sans-serif; /* Opsional: Mengatur font */
-            color: white; /* Opsional: Mengatur warna teks */
-            font-size: 3em; /* Opsional: Mengatur ukuran teks */
+            background: linear-gradient(to top, #0fffff, #ffffff, #00c6f8);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content:center ;
+            align-items: top;
+            font-family: Arial, Helvetica, sans-serif;
+            color: rgb(0, 0, 0);
+            font-size: 2em;
         }
 
-        /* Tambahkan style untuk span agar lebih terlihat, jika perlu */
         #typing {
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Opsional: Menambahkan bayangan teks */
+            font-weight: bold;
         }
     </style>
 </head>
@@ -30,12 +29,16 @@
 
     <script>
         var typing = new Typed("#typing", {
-            strings: ["Falih", "Seorang Murid"],
+            // Tambahkan teks baru di sini
+            strings: [
+                "<strong>WELCOME TO MY PAGE</strong>",
+                "<strong>SENANG BERTEMU DENGAN ANDA</strong>",
+                "WEB ini masih dalam project"
+            ],
             typeSpeed: 100,
             backSpeed: 50,
-            loop: false
+            loop: false // Jika ingin mengulang teks, ubah menjadi true
         });
     </script>
-
 </body>
 </html>
