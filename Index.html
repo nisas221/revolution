@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perkenalan & Keuangan</title>
+    <title>Perkenalan & Keuangan dengan Firebase</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,9 +19,11 @@
         
         body {
             font-family: 'Open Sans', sans-serif;
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #333;
             line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 50px;
         }
         
         .container {
@@ -86,6 +92,7 @@
             text-align: center;
             padding: 6rem 0;
             margin-bottom: 3rem;
+            border-radius: 0 0 20px 20px;
         }
         
         .hero h1 {
@@ -120,6 +127,14 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
+        .btn-secondary {
+            background: #2196F3;
+        }
+        
+        .btn-secondary:hover {
+            background: #0b7dda;
+        }
+        
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -131,20 +146,24 @@
             background: white;
             border-radius: 10px;
             padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.3s;
         }
         
         .feature-item:hover {
             transform: translateY(-10px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
         
         .feature-item h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
             color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .feature-item p {
@@ -373,12 +392,78 @@
             font-style: italic;
         }
         
+        .auth-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 2rem auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .auth-section h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .auth-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .user-info {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: inline-block;
+            margin: 0 auto 20px;
+        }
+        
+        .logout-btn {
+            background: #f44336;
+            margin-left: 10px;
+        }
+        
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+        
         footer {
             background: #2c3e50;
             color: #ddd;
             padding: 2rem 0;
             text-align: center;
             margin-top: 3rem;
+            border-radius: 20px 20px 0 0;
         }
         
         footer p {
@@ -427,7 +512,30 @@
             </div>
         </section>
         
-        <section id="finance" class="finance-section">
+        <section id="auth" class="auth-section">
+            <h2><i class="fas fa-user-lock"></i> Autentikasi Pengguna</h2>
+            <div id="userInfo" class="user-info" style="display: none;">
+                <span id="userEmail"></span>
+                <button id="logoutBtn" class="btn logout-btn">Logout</button>
+            </div>
+            <div id="loginSection">
+                <div class="auth-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="email@contoh.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <button id="loginBtn" class="btn">Login</button>
+                    <button id="registerBtn" class="btn btn-secondary">Daftar Akun Baru</button>
+                </div>
+            </div>
+            <div id="authStatus" class="status-message"></div>
+        </section>
+        
+        <section id="finance" class="finance-section" style="display: none;">
             <div class="container">
                 <h2 class="section-title">Pencatatan Keuangan</h2>
                 <div class="finance-container">
@@ -506,21 +614,108 @@
     </footer>
 
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7wTzQdT8Qv9YQx0a1hDkLzLmX7f0q4bM",
+            authDomain: "keuangan-falih.firebaseapp.com",
+            projectId: "keuangan-falih",
+            storageBucket: "keuangan-falih.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcd1234efgh5678ijkl90"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Initialize variables
+        let transactions = [];
+        let currentUser = null;
+
         document.addEventListener('DOMContentLoaded', function() {
             // Set default date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('date').value = today;
             
-            // Load transactions from localStorage
-            let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+            // Auth elements
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const authStatus = document.getElementById('authStatus');
+            const userInfo = document.getElementById('userInfo');
+            const userEmail = document.getElementById('userEmail');
+            const financeSection = document.getElementById('finance');
             
-            // Initialize finance summary
-            updateSummary();
-            renderTransactionList();
+            // Authentication state observer
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    userEmail.textContent = user.email;
+                    userInfo.style.display = 'block';
+                    document.getElementById('loginSection').style.display = 'none';
+                    financeSection.style.display = 'block';
+                    loadTransactions();
+                } else {
+                    currentUser = null;
+                    userInfo.style.display = 'none';
+                    document.getElementById('loginSection').style.display = 'block';
+                    financeSection.style.display = 'none';
+                    transactions = [];
+                    updateSummary();
+                    renderTransactionList();
+                }
+            });
+            
+            // Login button event
+            loginBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        authStatus.textContent = 'Login berhasil!';
+                        authStatus.className = 'status-message success';
+                    })
+                    .catch(error => {
+                        authStatus.textContent = `Error: ${error.message}`;
+                        authStatus.className = 'status-message error';
+                    });
+            });
+            
+            // Register button event
+            registerBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        authStatus.textContent = 'Akun berhasil dibuat!';
+                        authStatus.className = 'status-message success';
+                    })
+                    .catch(error => {
+                        authStatus.textContent = `Error: ${error.message}`;
+                        authStatus.className = 'status-message error';
+                    });
+            });
+            
+            // Logout button event
+            logoutBtn.addEventListener('click', function() {
+                auth.signOut();
+            });
             
             // Handle form submission
             document.getElementById('transactionForm').addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                if (!currentUser) {
+                    alert('Silakan login terlebih dahulu');
+                    return;
+                }
                 
                 // Get form values
                 const type = document.querySelector('input[name="type"]:checked').value;
@@ -536,29 +731,53 @@
                 
                 // Create transaction object
                 const transaction = {
-                    id: Date.now(),
                     type,
                     amount,
                     description,
-                    date
+                    date,
+                    userId: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                // Add to transactions array
-                transactions.push(transaction);
-                
-                // Save to localStorage
-                localStorage.setItem('transactions', JSON.stringify(transactions));
-                
-                // Update UI
-                updateSummary();
-                renderTransactionList();
-                
-                // Reset form
-                document.getElementById('amount').value = '';
-                document.getElementById('description').value = '';
-                document.getElementById('date').value = today;
-                document.getElementById('income').checked = true;
+                // Add to Firestore
+                db.collection('transactions').add(transaction)
+                    .then(() => {
+                        // Reset form
+                        document.getElementById('amount').value = '';
+                        document.getElementById('description').value = '';
+                        document.getElementById('date').value = today;
+                        document.getElementById('income').checked = true;
+                        
+                        // Transactions will be reloaded from Firestore in real-time
+                    })
+                    .catch(error => {
+                        console.error('Error adding transaction: ', error);
+                        alert('Terjadi kesalahan saat menyimpan transaksi');
+                    });
             });
+            
+            // Load transactions from Firestore
+            function loadTransactions() {
+                if (!currentUser) return;
+                
+                db.collection('transactions')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('createdAt', 'desc')
+                    .onSnapshot(snapshot => {
+                        transactions = [];
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            transactions.push({
+                                id: doc.id,
+                                ...data,
+                                date: data.date || data.createdAt.toDate().toISOString().split('T')[0]
+                            });
+                        });
+                        
+                        updateSummary();
+                        renderTransactionList();
+                    });
+            }
             
             // Update summary function
             function updateSummary() {
@@ -593,9 +812,6 @@
                     return;
                 }
                 
-                // Sort transactions by date (newest first)
-                transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-                
                 let html = '';
                 
                 transactions.forEach(transaction => {
@@ -608,4 +824,56 @@
                                     <span>${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</span>
                                 </div>
                             </div>
-                           
+                            <div class="transaction-amount">
+                                ${transaction.type === 'income' ? '+' : '-'} ${formatCurrency(transaction.amount)}
+                            </div>
+                            <button class="delete-btn" data-id="${transaction.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                transactionList.innerHTML = html;
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        deleteTransaction(id);
+                    });
+                });
+            }
+            
+            // Delete transaction
+            function deleteTransaction(id) {
+                if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+                    db.collection('transactions').doc(id).delete()
+                        .catch(error => {
+                            console.error('Error deleting transaction: ', error);
+                            alert('Terjadi kesalahan saat menghapus transaksi');
+                        });
+                }
+            }
+            
+            // Format currency to IDR
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(amount);
+            }
+            
+            // Format date to DD/MM/YYYY
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        });
+    </script>
+</body>
+</html>
