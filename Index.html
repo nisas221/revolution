@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perkenalan & Keuangan dengan Firebase</title>
+    <title>Aplikasi Keuangan Pribadi - Falih Ramadhan</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -469,6 +465,23 @@
         footer p {
             font-size: 1rem;
         }
+        
+        .firebase-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .firebase-connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .firebase-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -514,6 +527,7 @@
         
         <section id="auth" class="auth-section">
             <h2><i class="fas fa-user-lock"></i> Autentikasi Pengguna</h2>
+            <div id="firebaseStatus" class="firebase-status"></div>
             <div id="userInfo" class="user-info" style="display: none;">
                 <span id="userEmail"></span>
                 <button id="logoutBtn" class="btn logout-btn">Logout</button>
@@ -613,267 +627,17 @@
         </div>
     </footer>
 
-    <script>
-        // Firebase configuration
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+            from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, deleteDoc, doc } 
+            from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyD7wTzQdT8Qv9YQx0a1hDkLzLmX7f0q4bM",
-            authDomain: "keuangan-falih.firebaseapp.com",
-            projectId: "keuangan-falih",
-            storageBucket: "keuangan-falih.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcd1234efgh5678ijkl90"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        // Initialize variables
-        let transactions = [];
-        let currentUser = null;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set default date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('date').value = today;
-            
-            // Auth elements
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const loginBtn = document.getElementById('loginBtn');
-            const registerBtn = document.getElementById('registerBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const authStatus = document.getElementById('authStatus');
-            const userInfo = document.getElementById('userInfo');
-            const userEmail = document.getElementById('userEmail');
-            const financeSection = document.getElementById('finance');
-            
-            // Authentication state observer
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = user;
-                    userEmail.textContent = user.email;
-                    userInfo.style.display = 'block';
-                    document.getElementById('loginSection').style.display = 'none';
-                    financeSection.style.display = 'block';
-                    loadTransactions();
-                } else {
-                    currentUser = null;
-                    userInfo.style.display = 'none';
-                    document.getElementById('loginSection').style.display = 'block';
-                    financeSection.style.display = 'none';
-                    transactions = [];
-                    updateSummary();
-                    renderTransactionList();
-                }
-            });
-            
-            // Login button event
-            loginBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const email = emailInput.value;
-                const password = passwordInput.value;
-                
-                auth.signInWithEmailAndPassword(email, password)
-                    .then(() => {
-                        authStatus.textContent = 'Login berhasil!';
-                        authStatus.className = 'status-message success';
-                    })
-                    .catch(error => {
-                        authStatus.textContent = `Error: ${error.message}`;
-                        authStatus.className = 'status-message error';
-                    });
-            });
-            
-            // Register button event
-            registerBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const email = emailInput.value;
-                const password = passwordInput.value;
-                
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then(() => {
-                        authStatus.textContent = 'Akun berhasil dibuat!';
-                        authStatus.className = 'status-message success';
-                    })
-                    .catch(error => {
-                        authStatus.textContent = `Error: ${error.message}`;
-                        authStatus.className = 'status-message error';
-                    });
-            });
-            
-            // Logout button event
-            logoutBtn.addEventListener('click', function() {
-                auth.signOut();
-            });
-            
-            // Handle form submission
-            document.getElementById('transactionForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                if (!currentUser) {
-                    alert('Silakan login terlebih dahulu');
-                    return;
-                }
-                
-                // Get form values
-                const type = document.querySelector('input[name="type"]:checked').value;
-                const amount = parseFloat(document.getElementById('amount').value);
-                const description = document.getElementById('description').value;
-                const date = document.getElementById('date').value;
-                
-                // Validate amount
-                if (isNaN(amount) || amount <= 0) {
-                    alert('Masukkan jumlah yang valid');
-                    return;
-                }
-                
-                // Create transaction object
-                const transaction = {
-                    type,
-                    amount,
-                    description,
-                    date,
-                    userId: currentUser.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                // Add to Firestore
-                db.collection('transactions').add(transaction)
-                    .then(() => {
-                        // Reset form
-                        document.getElementById('amount').value = '';
-                        document.getElementById('description').value = '';
-                        document.getElementById('date').value = today;
-                        document.getElementById('income').checked = true;
-                        
-                        // Transactions will be reloaded from Firestore in real-time
-                    })
-                    .catch(error => {
-                        console.error('Error adding transaction: ', error);
-                        alert('Terjadi kesalahan saat menyimpan transaksi');
-                    });
-            });
-            
-            // Load transactions from Firestore
-            function loadTransactions() {
-                if (!currentUser) return;
-                
-                db.collection('transactions')
-                    .where('userId', '==', currentUser.uid)
-                    .orderBy('createdAt', 'desc')
-                    .onSnapshot(snapshot => {
-                        transactions = [];
-                        snapshot.forEach(doc => {
-                            const data = doc.data();
-                            transactions.push({
-                                id: doc.id,
-                                ...data,
-                                date: data.date || data.createdAt.toDate().toISOString().split('T')[0]
-                            });
-                        });
-                        
-                        updateSummary();
-                        renderTransactionList();
-                    });
-            }
-            
-            // Update summary function
-            function updateSummary() {
-                let incomeTotal = 0;
-                let expenseTotal = 0;
-                
-                transactions.forEach(transaction => {
-                    if (transaction.type === 'income') {
-                        incomeTotal += transaction.amount;
-                    } else {
-                        expenseTotal += transaction.amount;
-                    }
-                });
-                
-                const balanceTotal = incomeTotal - expenseTotal;
-                
-                document.getElementById('incomeTotal').textContent = formatCurrency(incomeTotal);
-                document.getElementById('expenseTotal').textContent = formatCurrency(expenseTotal);
-                document.getElementById('balanceTotal').textContent = formatCurrency(balanceTotal);
-            }
-            
-            // Render transaction list
-            function renderTransactionList() {
-                const transactionList = document.getElementById('transactionList');
-                
-                if (transactions.length === 0) {
-                    transactionList.innerHTML = `
-                        <div class="no-transactions">
-                            <p>Belum ada transaksi. Mulai tambahkan transaksi pertama Anda!</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let html = '';
-                
-                transactions.forEach(transaction => {
-                    html += `
-                        <div class="transaction-item ${transaction.type}">
-                            <div class="transaction-info">
-                                <h4>${transaction.description}</h4>
-                                <div class="transaction-meta">
-                                    <span>${formatDate(transaction.date)}</span>
-                                    <span>${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</span>
-                                </div>
-                            </div>
-                            <div class="transaction-amount">
-                                ${transaction.type === 'income' ? '+' : '-'} ${formatCurrency(transaction.amount)}
-                            </div>
-                            <button class="delete-btn" data-id="${transaction.id}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-                
-                transactionList.innerHTML = html;
-                
-                // Add event listeners to delete buttons
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        deleteTransaction(id);
-                    });
-                });
-            }
-            
-            // Delete transaction
-            function deleteTransaction(id) {
-                if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
-                    db.collection('transactions').doc(id).delete()
-                        .catch(error => {
-                            console.error('Error deleting transaction: ', error);
-                            alert('Terjadi kesalahan saat menghapus transaksi');
-                        });
-                }
-            }
-            
-            // Format currency to IDR
-            function formatCurrency(amount) {
-                return new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0
-                }).format(amount);
-            }
-            
-            // Format date to DD/MM/YYYY
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const year = date.getFullYear();
-                return `${day}/${month}/${year}`;
-            }
-        });
-    </script>
-</body>
-</html>
+            apiKey: "AIzaSyAAxjCsHvUKgHD-SJf7NK5fzC4zwuMwkgU",
+       
