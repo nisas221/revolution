@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keuangan - Aplikasi Keuangan</title>
+    <title>Keuangan - Falih Ramadhan</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -19,7 +19,6 @@
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
-            padding-bottom: 50px;
         }
         
         .container {
@@ -32,7 +31,7 @@
         header {
             background: linear-gradient(135deg, #2c3e50, #1a1a2e);
             color: white;
-            padding: 1.5rem 0;
+            padding: 1.2rem 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
@@ -47,7 +46,7 @@
         
         .logo a {
             color: white;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             text-decoration: none;
             display: flex;
@@ -59,25 +58,14 @@
             color: #4CAF50;
         }
         
-        .nav-links {
+        .user-info {
             display: flex;
-            list-style: none;
-            gap: 2rem;
+            align-items: center;
+            gap: 15px;
         }
         
-        .nav-links a {
-            color: #ddd;
-            text-decoration: none;
+        .user-info span {
             font-weight: 500;
-            font-size: 1.1rem;
-            transition: color 0.3s;
-            padding: 0.5rem;
-            border-radius: 4px;
-        }
-        
-        .nav-links a:hover, .nav-links a.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
         }
         
         .btn-logout {
@@ -91,45 +79,43 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.3s;
         }
         
         .btn-logout:hover {
             background: #d32f2f;
+            transform: scale(1.05);
         }
         
-        .finance-section {
-            background: white;
-            border-radius: 10px;
-            padding: 2.5rem;
-            margin: 2rem 0;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        main {
+            padding: 2rem 0;
         }
         
-        .section-title {
+        .welcome-section {
             text-align: center;
             margin-bottom: 2.5rem;
-            color: #2c3e50;
-            font-size: 2.2rem;
-            position: relative;
-            padding-bottom: 15px;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(to right, #4CAF50, #2196F3);
-            border-radius: 2px;
+        .welcome-section h1 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-section p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
         }
         
         .finance-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2.5rem;
+            gap: 2rem;
+            margin-bottom: 3rem;
         }
         
         @media (max-width: 768px) {
@@ -139,19 +125,21 @@
         }
         
         .form-container, .summary-container {
-            background: #f9f9f9;
-            padding: 1.8rem;
+            background: white;
             border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            padding: 1.8rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
         
-        .form-container h3, .summary-container h3 {
+        .section-title {
             margin-bottom: 1.5rem;
             color: #2c3e50;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             display: flex;
             align-items: center;
             gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
         }
         
         .form-group {
@@ -171,7 +159,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
-            transition: border 0.3s;
+            transition: all 0.3s;
         }
         
         input:focus, select:focus {
@@ -190,47 +178,74 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            cursor: pointer;
         }
         
         .radio-option input[type="radio"] {
             width: auto;
         }
         
+        .btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
         .summary-boxes {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1.5rem;
+            gap: 1.2rem;
             margin-bottom: 2rem;
         }
         
         .summary-box {
-            background: white;
+            background: #f9f9f9;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1.2rem;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .summary-box:hover {
+            transform: translateY(-5px);
         }
         
         .summary-box.income {
-            border-top: 4px solid #4CAF50;
+            border-left: 4px solid #4CAF50;
         }
         
         .summary-box.expense {
-            border-top: 4px solid #f44336;
+            border-left: 4px solid #f44336;
         }
         
         .summary-box.balance {
-            border-top: 4px solid #2196F3;
+            border-left: 4px solid #2196F3;
         }
         
         .summary-box h4 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-bottom: 0.5rem;
             color: #666;
         }
         
         .summary-box .amount {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
         }
         
@@ -262,6 +277,11 @@
             align-items: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .transaction-item:hover {
+            transform: translateX(5px);
         }
         
         .transaction-item.income {
@@ -291,6 +311,8 @@
         .transaction-amount {
             font-weight: 700;
             font-size: 1.2rem;
+            min-width: 100px;
+            text-align: right;
         }
         
         .income .transaction-amount {
@@ -309,6 +331,12 @@
             font-size: 1.1rem;
             padding: 5px;
             margin-left: 10px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .delete-btn:hover {
+            opacity: 1;
         }
         
         .no-transactions {
@@ -321,34 +349,35 @@
         footer {
             background: #2c3e50;
             color: #ddd;
-            padding: 2rem 0;
+            padding: 1.5rem 0;
             text-align: center;
             margin-top: 3rem;
-            border-radius: 20px 20px 0 0;
         }
         
         footer p {
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
         
-        .btn {
-            display: inline-block;
-            background: #4CAF50;
-            color: white;
-            padding: 0.8rem 1.8rem;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
+        /* Alert untuk feedback */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
         }
         
-        .btn:hover {
-            background: #45a049;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -357,90 +386,91 @@
         <div class="container">
             <nav>
                 <div class="logo">
-                    <a href="#"><i class="fas fa-wallet"></i> Falih Ramadhan</a>
+                    <a href="#"><i class="fas fa-wallet"></i> Keuangan Falih</a>
                 </div>
-                <ul class="nav-links">
-                    <li><a href="#" class="active">Beranda</a></li>
-                    <li><a href="#">Tentang Kami</a></li>
-                    <li><a href="#">Layanan</a></li>
-                    <li><a href="#">Kontak</a></li>
-                </ul>
-                <button id="logoutBtn" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
+                <div class="user-info">
+                    <span><i class="fas fa-user"></i> falih11</span>
+                    <button id="logoutBtn" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
             </nav>
         </div>
     </header>
 
     <main class="container">
-        <section class="finance-section">
-            <h2 class="section-title">Pencatatan Keuangan</h2>
-            <div class="finance-container">
-                <div class="form-container">
-                    <h3><i class="fas fa-plus-circle"></i> Tambah Transaksi</h3>
-                    <form id="transactionForm">
-                        <div class="form-group">
-                            <label for="transactionType">Jenis Transaksi</label>
-                            <div class="radio-group">
-                                <div class="radio-option">
-                                    <input type="radio" id="income" name="type" value="income" checked>
-                                    <label for="income">Pemasukan</label>
-                                </div>
-                                <div class="radio-option">
-                                    <input type="radio" id="expense" name="type" value="expense">
-                                    <label for="expense">Pengeluaran</label>
-                                </div>
+        <div id="alert" class="alert"></div>
+        
+        <section class="welcome-section">
+            <h1>Selamat Datang, Falih!</h1>
+            <p>Kelola keuangan pribadi Anda dengan mudah. Catat semua pemasukan dan pengeluaran untuk mengontrol keuangan Anda.</p>
+        </section>
+        
+        <div class="finance-container">
+            <div class="form-container">
+                <h3 class="section-title"><i class="fas fa-plus-circle"></i> Tambah Transaksi</h3>
+                <form id="transactionForm">
+                    <div class="form-group">
+                        <label for="transactionType">Jenis Transaksi</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="income" name="type" value="income" checked>
+                                <label for="income">Pemasukan</label>
                             </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="amount">Jumlah (Rp)</label>
-                            <input type="number" id="amount" placeholder="Masukkan jumlah" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="description">Keterangan</label>
-                            <input type="text" id="description" placeholder="Contoh: Gaji bulanan, Beli pulsa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="date">Tanggal</label>
-                            <input type="date" id="date" required>
-                        </div>
-                        
-                        <button type="submit" class="btn">Simpan Transaksi</button>
-                    </form>
-                </div>
-                
-                <div class="summary-container">
-                    <h3><i class="fas fa-chart-pie"></i> Ringkasan Keuangan</h3>
-                    
-                    <div class="summary-boxes">
-                        <div class="summary-box income">
-                            <h4>Pemasukan</h4>
-                            <div class="amount" id="incomeTotal">Rp 0</div>
-                        </div>
-                        
-                        <div class="summary-box expense">
-                            <h4>Pengeluaran</h4>
-                            <div class="amount" id="expenseTotal">Rp 0</div>
-                        </div>
-                        
-                        <div class="summary-box balance">
-                            <h4>Saldo</h4>
-                            <div class="amount" id="balanceTotal">Rp 0</div>
+                            <div class="radio-option">
+                                <input type="radio" id="expense" name="type" value="expense">
+                                <label for="expense">Pengeluaran</label>
+                            </div>
                         </div>
                     </div>
                     
-                    <h3 style="margin-top: 2rem;"><i class="fas fa-list"></i> Riwayat Transaksi</h3>
-                    <div class="transaction-list" id="transactionList">
-                        <div class="no-transactions">
-                            <p>Belum ada transaksi. Mulai tambahkan transaksi pertama Anda!</p>
-                        </div>
+                    <div class="form-group">
+                        <label for="amount">Jumlah (Rp)</label>
+                        <input type="number" id="amount" placeholder="Masukkan jumlah" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Keterangan</label>
+                        <input type="text" id="description" placeholder="Contoh: Gaji bulanan, Beli pulsa" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Tanggal</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Simpan Transaksi</button>
+                </form>
+            </div>
+            
+            <div class="summary-container">
+                <h3 class="section-title"><i class="fas fa-chart-pie"></i> Ringkasan Keuangan</h3>
+                
+                <div class="summary-boxes">
+                    <div class="summary-box income">
+                        <h4>Pemasukan</h4>
+                        <div class="amount" id="incomeTotal">Rp 0</div>
+                    </div>
+                    
+                    <div class="summary-box expense">
+                        <h4>Pengeluaran</h4>
+                        <div class="amount" id="expenseTotal">Rp 0</div>
+                    </div>
+                    
+                    <div class="summary-box balance">
+                        <h4>Saldo</h4>
+                        <div class="amount" id="balanceTotal">Rp 0</div>
+                    </div>
+                </div>
+                
+                <h3 class="section-title"><i class="fas fa-list"></i> Riwayat Transaksi</h3>
+                <div class="transaction-list" id="transactionList">
+                    <div class="no-transactions">
+                        <p>Belum ada transaksi. Mulai tambahkan transaksi pertama Anda!</p>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
 
     <footer>
@@ -456,7 +486,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Cek login
             const isLoggedIn = localStorage.getItem('isLoggedIn');
-            if (isLoggedIn !== 'true') {
+            if (!isLoggedIn || isLoggedIn !== 'true') {
                 window.location.href = 'index.html';
                 return;
             }
@@ -486,7 +516,7 @@
                 
                 // Validate amount
                 if (isNaN(amount) || amount <= 0) {
-                    alert('Masukkan jumlah yang valid');
+                    showAlert('Masukkan jumlah yang valid', 'error');
                     return;
                 }
                 
@@ -514,21 +544,43 @@
                 document.getElementById('description').value = '';
                 document.getElementById('date').value = today;
                 document.getElementById('income').checked = true;
+                
+                // Animasi feedback
+                const btn = document.querySelector('#transactionForm .btn');
+                btn.textContent = '✓ Tersimpan!';
+                btn.style.backgroundColor = '#2E7D32';
+                
+                setTimeout(() => {
+                    btn.textContent = 'Simpan Transaksi';
+                    btn.style.backgroundColor = '#4CAF50';
+                }, 1500);
+                
+                showAlert('Transaksi berhasil ditambahkan', 'success');
             });
             
             // Load transactions from localStorage
             function loadTransactions() {
-                const storedTransactions = localStorage.getItem('transactions');
-                if (storedTransactions) {
-                    transactions = JSON.parse(storedTransactions);
+                try {
+                    const storedTransactions = localStorage.getItem('transactions');
+                    if (storedTransactions) {
+                        transactions = JSON.parse(storedTransactions);
+                    }
+                    updateSummary();
+                    renderTransactionList();
+                } catch (e) {
+                    console.error('Error loading transactions:', e);
+                    showAlert('Error memuat data transaksi', 'error');
                 }
-                updateSummary();
-                renderTransactionList();
             }
             
             // Save transactions to localStorage
             function saveTransactions() {
-                localStorage.setItem('transactions', JSON.stringify(transactions));
+                try {
+                    localStorage.setItem('transactions', JSON.stringify(transactions));
+                } catch (e) {
+                    console.error('Error saving transactions:', e);
+                    showAlert('Error menyimpan data transaksi', 'error');
+                }
             }
             
             // Update summary function
@@ -576,33 +628,4 @@
                                 <h4>${transaction.description}</h4>
                                 <div class="transaction-meta">
                                     <span>${formatDate(transaction.date)}</span>
-                                    <span>${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</span>
-                                </div>
-                            </div>
-                            <div class="transaction-amount">
-                                ${transaction.type === 'income' ? '+' : '-'} ${formatCurrency(transaction.amount)}
-                            </div>
-                            <button class="delete-btn" data-id="${transaction.id}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-                
-                transactionList.innerHTML = html;
-                
-                // Add event listeners to delete buttons
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const id = parseInt(this.getAttribute('data-id'));
-                        deleteTransaction(id);
-                    });
-                });
-            }
-            
-            // Delete transaction
-            function deleteTransaction(id) {
-                if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
-                    transactions = transactions.filter(transaction => transaction.id !== id);
-                    saveTransactions();
-   
+                                    <span>${transactio
