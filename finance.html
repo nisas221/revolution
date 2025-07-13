@@ -206,6 +206,22 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
+        .btn-backup {
+            background: #2196F3;
+        }
+        
+        .btn-backup:hover {
+            background: #0b7dda;
+        }
+        
+        .btn-restore {
+            background: #FF9800;
+        }
+        
+        .btn-restore:hover {
+            background: #e68a00;
+        }
+        
         .summary-boxes {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -346,6 +362,38 @@
             font-style: italic;
         }
         
+        .backup-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .backup-section h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .backup-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 480px) {
+            .backup-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .restore-input {
+            display: none;
+        }
+        
         footer {
             background: #2c3e50;
             color: #ddd;
@@ -379,6 +427,15 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px dashed #ddd;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -404,6 +461,20 @@
         <section class="welcome-section">
             <h1>Selamat Datang, Falih!</h1>
             <p>Kelola keuangan pribadi Anda dengan mudah. Catat semua pemasukan dan pengeluaran untuk mengontrol keuangan Anda.</p>
+        </section>
+        
+        <section class="backup-section">
+            <h3><i class="fas fa-database"></i> Backup & Restore Data</h3>
+            <div class="backup-buttons">
+                <button id="backupBtn" class="btn btn-backup">
+                    <i class="fas fa-download"></i> Backup Data
+                </button>
+                <button id="restoreBtn" class="btn btn-restore">
+                    <i class="fas fa-upload"></i> Restore Data
+                </button>
+            </div>
+            <input type="file" id="restoreFile" class="restore-input" accept=".json">
+            <div id="fileInfo" class="file-info"></div>
         </section>
         
         <div class="finance-container">
@@ -500,6 +571,17 @@
                 localStorage.removeItem('isLoggedIn');
                 window.location.href = 'index.html';
             });
+            
+            // Backup button
+            document.getElementById('backupBtn').addEventListener('click', backupData);
+            
+            // Restore button
+            document.getElementById('restoreBtn').addEventListener('click', function() {
+                document.getElementById('restoreFile').click();
+            });
+            
+            // Restore file input
+            document.getElementById('restoreFile').addEventListener('change', restoreData);
             
             // Load transactions from localStorage
             loadTransactions();
@@ -628,4 +710,163 @@
                                 <h4>${transaction.description}</h4>
                                 <div class="transaction-meta">
                                     <span>${formatDate(transaction.date)}</span>
-                                    <span>${transactio
+                                    <span>${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</span>
+                                </div>
+                            </div>
+                            <div class="transaction-amount">
+                                ${transaction.type === 'income' ? '+' : '-'} ${formatCurrency(transaction.amount)}
+                            </div>
+                            <button class="delete-btn" data-id="${transaction.id}" title="Hapus transaksi">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                transactionList.innerHTML = html;
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteTransaction(id);
+                    });
+                });
+            }
+            
+            // Delete transaction
+            function deleteTransaction(id) {
+                if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+                    transactions = transactions.filter(transaction => transaction.id !== id);
+                    saveTransactions();
+                    updateSummary();
+                    renderTransactionList();
+                    showAlert('Transaksi berhasil dihapus', 'success');
+                }
+            }
+            
+            // Format currency to IDR
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(amount);
+            }
+            
+            // Format date to DD/MM/YYYY
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            
+            // Show alert message
+            function showAlert(message, type) {
+                const alertEl = document.getElementById('alert');
+                alertEl.textContent = message;
+                alertEl.className = `alert alert-${type}`;
+                alertEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    alertEl.style.display = 'none';
+                }, 3000);
+            }
+            
+            // Backup data function
+            function backupData() {
+                try {
+                    // Buat objek data yang akan di-backup
+                    const backupData = {
+                        app: "Aplikasi Keuangan Falih",
+                        version: "1.0",
+                        backupDate: new Date().toISOString(),
+                        transactions: transactions
+                    };
+                    
+                    // Konversi ke string JSON
+                    const dataStr = JSON.stringify(backupData, null, 2);
+                    
+                    // Buat blob dari data
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    
+                    // Buat URL untuk blob
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Buat elemen anchor untuk download
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `backup-keuangan-${new Date().toISOString().slice(0, 10)}.json`;
+                    
+                    // Klik anchor untuk memulai download
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Bersihkan
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 100);
+                    
+                    showAlert('Backup data berhasil diunduh!', 'success');
+                } catch (e) {
+                    console.error('Error backing up data:', e);
+                    showAlert('Gagal membuat backup data', 'error');
+                }
+            }
+            
+            // Restore data function
+            function restoreData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Tampilkan info file
+                const fileInfo = document.getElementById('fileInfo');
+                fileInfo.innerHTML = `<i class="fas fa-file"></i> File dipilih: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                fileInfo.style.display = 'block';
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const backupData = JSON.parse(e.target.result);
+                        
+                        // Validasi data
+                        if (!backupData.transactions || !Array.isArray(backupData.transactions)) {
+                            throw new Error('Format file backup tidak valid');
+                        }
+                        
+                        // Konfirmasi sebelum restore
+                        if (!confirm(`Anda akan mengimpor ${backupData.transactions.length} transaksi. Data saat ini akan digantikan. Lanjutkan?`)) {
+                            fileInfo.style.display = 'none';
+                            return;
+                        }
+                        
+                        // Ganti data transaksi
+                        transactions = backupData.transactions;
+                        
+                        // Simpan ke localStorage
+                        saveTransactions();
+                        
+                        // Perbarui UI
+                        updateSummary();
+                        renderTransactionList();
+                        
+                        showAlert(`Data berhasil dipulihkan! ${transactions.length} transaksi telah diimpor.`, 'success');
+                    } catch (e) {
+                        console.error('Error restoring data:', e);
+                        showAlert('Gagal memulihkan data: Format file tidak valid', 'error');
+                    }
+                    
+                    // Reset input file
+                    event.target.value = '';
+                    fileInfo.style.display = 'none';
+                };
+                
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+</html>
