@@ -18,7 +18,7 @@ header {
     width: 100%;
     top: 0;
     z-index: 1000;
-    border-bottom: 2px solid #00b7ff;
+    border-bottom: 2px solid #65a6c0;
 }
 
 nav {
@@ -131,7 +131,19 @@ nav {
     transition: transform 0.3s ease;
     border: 1px solid #eee;
 }
-
+.profile-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    animation: slideInFromLeft 1s ease-out;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
 .feature-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
