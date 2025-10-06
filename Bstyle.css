@@ -29,6 +29,14 @@ header {
     padding: 0 15px;
 }
 
+.post-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+
+}
 .header-content {
     display: flex;
     justify-content: space-between;
@@ -383,4 +391,5 @@ footer {
     #typing-text {
         font-size: 1.5rem;
     }
+
 }
