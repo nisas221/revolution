@@ -23,6 +23,11 @@
                     <li><a href="#">Next update</a></li>
                     <li><a href="kontak.html">Kontak</a></li>
                 </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </nav>
         </div>
     </header>
@@ -59,5 +64,16 @@
             <p>&copy; The Website still under maintenance </p>
         </div>
     </footer>
+
+    <script>
+        // JavaScript untuk toggle menu hamburger
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
